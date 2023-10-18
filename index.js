@@ -46,6 +46,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const carCollection = client.db('CarDB').collection('car');
+        const brandCollection = client.db('brandDB').collection('brand');
 
         //Post car data 
         app.post('/car', async (req, res) => {
@@ -62,6 +63,26 @@ async function run() {
         app.get('/car', async (req, res) => {
 
             const cursor = carCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+
+        })
+        
+        //Post Brand data 
+        app.post('/brand', async (req, res) => {
+
+
+            const newBrand = req.body;
+            console.log(newBrand)
+            const result = await brandCollection.insertOne(newBrand);
+            res.send(result);
+        })
+
+        // Get Brand Data
+
+        app.get('/brand', async (req, res) => {
+
+            const cursor = brandCollection.find();
             const result = await cursor.toArray();
             res.send(result)
 
