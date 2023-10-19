@@ -107,12 +107,13 @@ async function run() {
         })
 
         //Get car Data for Update
-        app.get('/update/:id', async (req, res) => {
+        app.get('/update/:name', async (req, res) => {
 
-            const id = req.params.id;
+            const id = req.params.name;
             const query = {_id: new ObjectId(id)}
             const result = await carCollection.findOne(query);
             res.send(result);
+            console.log(id)
 
         })
 
