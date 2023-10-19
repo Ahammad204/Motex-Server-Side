@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //Middleware
 app.use(cors());
@@ -28,8 +28,6 @@ app.listen(port, () => {
 
 //Connect to MongoDB
 
-console.log(process.env.DB_USER)
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ofd8wu3.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -47,6 +45,7 @@ async function run() {
         await client.connect();
         const carCollection = client.db('CarDB').collection('car');
         const brandCollection = client.db('brandDB').collection('brand');
+        const brandSlideCollection = client.db('brandSlideDB').collection('slide');
 
         //Post car data 
         app.post('/car', async (req, res) => {
@@ -85,6 +84,35 @@ async function run() {
             const cursor = brandCollection.find();
             const result = await cursor.toArray();
             res.send(result)
+
+        })
+        //Post BrandSlider data 
+        app.post('/slide', async (req, res) => {
+
+
+            const newBrandSlide = req.body;
+            console.log(newBrandSlide)
+            const result = await brandSlideCollection.insertOne(newBrandSlide);
+            res.send(result);
+        })
+
+        // Get BrandSlider Data
+
+        app.get('/slide', async (req, res) => {
+
+            const cursor = brandSlideCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+
+        })
+
+        //Get car Data for Update
+        app.get('/update/:id', async (req, res) => {
+
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await carCollection.findOne(query);
+            res.send(result);
 
         })
 
