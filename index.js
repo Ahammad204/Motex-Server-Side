@@ -46,6 +46,7 @@ async function run() {
         const carCollection = client.db('CarDB').collection('car');
         const brandCollection = client.db('brandDB').collection('brand');
         const brandSlideCollection = client.db('brandSlideDB').collection('slide');
+        const cartCollection = client.db('cartDB').collection('cart');
 
         //Post car data 
         app.post('/car', async (req, res) => {
@@ -66,7 +67,7 @@ async function run() {
             res.send(result)
 
         })
-        
+
         //Post Brand data 
         app.post('/brand', async (req, res) => {
 
@@ -107,13 +108,62 @@ async function run() {
         })
 
         //Get car Data for Update
-        app.get('/update/:name', async (req, res) => {
+        app.get('/update/:id', async (req, res) => {
 
-            const id = req.params.name;
-            const query = {_id: new ObjectId(id)}
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
             const result = await carCollection.findOne(query);
             res.send(result);
             console.log(id)
+
+        })
+
+        //Update car data
+
+        app.put('/car/:id', async (req, res) => {
+
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updatedCar = req.body;
+            const car = {
+
+                $set: {
+
+                    name: updatedCar.name,
+                    brand: updatedCar.brand,
+                    type: updatedCar.type,
+                    price: updatedCar.price,
+                    short: updatedCar.short,
+                    rating2: updatedCar.rating2,
+                    photo: updatedCar.photo
+
+                }
+
+            }
+
+            const result = await carCollection.updateOne(filter, car, options)
+            res.send(result)
+
+        })
+
+        //Post Cart data 
+        app.post('/cart', async (req, res) => {
+
+
+            const newCart = req.body;
+            console.log(newCart)
+            const result = await cartCollection.insertOne(newCart);
+            res.send(result);
+        })
+
+        // Get Cart Data
+
+        app.get('/cart', async (req, res) => {
+
+            const cursor = cartCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
 
         })
 
